@@ -1,0 +1,229 @@
+🔄 Update Instruction: Abstract Node Visualization + Connector Logic
+1️⃣ Dual-Layer Node Model (Core Change)
+
+Each node now has two synchronized representations:
+
+A. Abstract (Visual) Layer — default
+
+No code shown
+
+Shows:
+
+Node title
+
+Input ports
+
+Output ports
+
+Status (idle / running / error)
+
+Interactable via drag, connect, run
+
+B. Code Layer — optional
+
+Full Python code editor
+
+Editable by user
+
+Always reflects the abstract layer’s contract
+
+🔁 Toggling between layers should be instant and non-destructive.
+
+2️⃣ Node Contract (This Is the Heart)
+
+Every node must explicitly define a contract:
+
+NodeContract {
+  inputs: Array<{
+    name: string
+    type?: string
+  }>
+  outputs: Array<{
+    name: string
+    type?: string
+  }>
+}
+
+
+This contract is the only thing the canvas and connectors care about.
+
+The code must respect this contract — not the other way around.
+
+3️⃣ Visual Node Layout (Abstract View)
+Structure
+┌──────────────────────┐
+│  Node Name           │
+│──────────────────────│
+│  Inputs              │
+│  • df                │◀── connector
+│  • labels            │◀── connector
+│                      │
+│  Outputs             │
+│  • model             │──▶ connector
+│  • metrics           │──▶ connector
+└──────────────────────┘
+
+UI rules
+
+Inputs always on left
+
+Outputs always on right
+
+Ports are always visible
+
+Code is never shown by default
+
+This gives Scratch-level clarity with ML-grade power.
+
+4️⃣ Connector Logic (Updated, Precise Behavior)
+A connector represents:
+
+“Bind output X from node A to input Y of node B”
+
+Connector rules:
+
+Output → Input only
+
+Names must match declared contracts
+
+One input = one source (no ambiguity)
+
+One output → many inputs allowed
+
+Internally store connectors as:
+{
+  fromNodeId,
+  fromOutput,
+  toNodeId,
+  toInput
+}
+
+5️⃣ Runtime Execution Mapping (Very Important)
+
+When executing a node:
+
+Collect all incoming connectors
+
+Build input object:
+
+{
+  inputName: valueFromUpstream
+}
+
+
+Inject inputs into execution scope
+
+Execute node code
+
+Extract declared outputs only
+
+Store outputs in graph state
+
+⚠️ The node code cannot access undeclared inputs.
+
+This enforces discipline and predictability.
+
+6️⃣ Keeping Code & Visual Layer in Sync
+Output declaration
+
+User must declare outputs via UI:
+
+“Add output”
+
+Name it
+
+(Optional) describe it
+
+Code must assign to that name.
+
+If not:
+
+Node fails validation
+
+Visual error shown
+
+Example:
+Declared output: model
+
+Required in code:
+
+model = train(...)
+
+Input declaration
+
+Inputs are:
+
+Declared visually
+
+Bound via connectors
+
+Available as variables in code
+
+No connector → input is undefined → execution error
+
+7️⃣ Code Visibility Rules (Strict)
+
+Canvas view never shows code
+
+Code is accessed by:
+
+double click
+
+side panel
+
+toggle button
+
+This keeps the system visual-first, not code-first.
+
+8️⃣ Visual Feedback (Crucial UX)
+
+Each node shows:
+
+Green dot → executed successfully
+
+Yellow → waiting for inputs
+
+Red → execution error
+
+Each port:
+
+Grey → unconnected
+
+Blue → connected
+
+Red → incompatible / missing
+
+Edges:
+
+Solid → valid
+
+Dashed → inactive
+
+Red → broken
+
+This replaces reading logs for most issues.
+
+9️⃣ Node Creation Paths (Updated)
+
+Nodes can be created from:
+
+Dragging a function block
+
+Importing a notebook cell
+
+Creating an empty code node
+
+All three result in:
+
+Contract generated
+
+Abstract view shown
+
+Code hidden by default
+
+10️⃣ Non-Negotiable Design Principle
+
+The graph is the source of truth.
+Code is an implementation detail.
+
+This is the shift you’re making — and it’s the right one.

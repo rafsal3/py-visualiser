@@ -17,21 +17,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Global execution scope shared across all code executions
+# This allows variables to persist between cell executions, like Jupyter notebooks
+GLOBAL_SCOPE = {}
+
 class CodeRequest(BaseModel):
     code: str
 
 @app.post("/execute")
 async def execute_code(request: CodeRequest):
+    print(f"[Backend] Executing code in global scope")
+    print(f"[Backend] Current global scope keys: {list(GLOBAL_SCOPE.keys())}")
+    
     stdout_buffer = io.StringIO()
     stderr_buffer = io.StringIO()
     
     try:
         with contextlib.redirect_stdout(stdout_buffer), contextlib.redirect_stderr(stderr_buffer):
-            # Safe-ish execution for MVP (User runs their own local code)
-            # Use a shared globals dict if we want state persistence across cells later
-            # For now, isolated execution per run
-            exec_globals = {}
-            exec(request.code, exec_globals)
+            # Execute in the shared global scope
+            # Variables created in one execution persist for future executions
+            exec(request.code, GLOBAL_SCOPE)
+            
+        print(f"[Backend] After execution, global scope keys: {list(GLOBAL_SCOPE.keys())}")
         
         return {
             "stdout": stdout_buffer.getvalue(),
@@ -39,12 +46,19 @@ async def execute_code(request: CodeRequest):
             "status": "success"
         }
     except Exception:
-        # Capture the full traceback including the exception message
         return {
             "stdout": stdout_buffer.getvalue(),
             "stderr": traceback.format_exc(),
             "status": "error"
         }
+
+@app.post("/reset")
+async def reset_scope():
+    """Reset the global execution scope"""
+    global GLOBAL_SCOPE
+    GLOBAL_SCOPE = {}
+    print("[Backend] Global scope reset")
+    return {"status": "success", "message": "Global scope reset"}
 
 if __name__ == "__main__":
     import uvicorn

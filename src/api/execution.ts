@@ -27,3 +27,9 @@ export async function executeCode(code: string): Promise<ExecutionResult> {
         };
     }
 }
+
+export async function resetScope(): Promise<void> {
+    await fetch('http://127.0.0.1:8000/reset', {
+        method: 'POST',
+    });
+}
