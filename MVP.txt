@@ -1,0 +1,308 @@
+🎯 MVP GOAL (Very Important)
+
+Enable users to visually build and execute a Python notebook as a node graph,
+while still allowing custom code — without hiding Python.
+
+If it doesn’t serve that goal, it’s out of MVP.
+
+🧠 Core Mental Model (Lock this early)
+1 node = 1 Python cell
+
+Nodes are code containers, not magic blocks.
+
+Blocks = pre-filled code templates, not separate logic.
+
+This keeps:
+
+Python first-class
+
+Execution predictable
+
+Power users happy
+
+🧩 MVP ARCHITECTURE OVERVIEW
+Frontend (your focus now)
+
+React + TypeScript
+
+Tailwind CSS
+
+Node graph engine (visual only)
+
+Monaco Editor for code
+
+Python kernel (local / backend stub)
+
+Backend (thin for MVP)
+
+Python execution engine
+
+Package introspection
+
+Execution + state tracking
+
+You can stub parts initially.
+
+🧱 MVP FEATURE BREAKDOWN
+1️⃣ Canvas & Node System (FOUNDATION)
+What to build
+
+Infinite canvas
+
+Zoom + pan
+
+Grid background
+
+Node creation
+
+Drag, move, select
+
+Connect nodes (directed edges)
+
+Node anatomy
+
+Each node contains:
+
+Title (cell name)
+
+Status indicator (idle / running / error)
+
+Code editor toggle
+
+Inputs & outputs (visual only for MVP)
+
+Tech suggestions
+
+reactflow or custom canvas if you’re brave
+
+Tailwind for clean UI
+
+Zustand / Jotai for graph state
+
+📌 Rule:
+Edges define execution order. No hidden execution.
+
+2️⃣ Python Cell Node (THE HEART)
+Node behavior
+
+Has editable Python code
+
+Can be run individually
+
+Can be run via graph traversal
+
+Output panel:
+
+stdout
+
+error
+
+plots (later)
+
+Execution rules (simple but strict)
+
+Node only sees:
+
+outputs of its parent nodes
+
+its own code
+
+No global execution chaos
+
+This alone already fixes half of Jupyter’s pain.
+
+3️⃣ Drag-and-Drop Function Blocks (Your “Scratch” Layer)
+
+This is where your idea shines.
+
+Concept
+
+Blocks are code generators, not runtime logic.
+
+When dragged:
+
+They generate Python code inside a node
+
+User can edit that code freely
+
+Example block types
+
+Load CSV
+
+Train Model
+
+Split Dataset
+
+Plot Accuracy
+
+Save Model
+
+Each block = Python template + metadata.
+
+{
+  name: "Load CSV",
+  params: ["path"],
+  code: "import pandas as pd\ndf = pd.read_csv({path})"
+}
+
+
+No magic runtime = less bugs.
+
+4️⃣ Package Manager Panel (VERY MVP-CLEAR)
+What you described — do it minimally
+Sidebar: “Libraries”
+
+Search input
+
+Install package (pip)
+
+Expand package → list callable functions
+
+Example:
+
+pandas
+ ├─ read_csv
+ ├─ DataFrame
+ ├─ concat
+
+Drag behavior
+
+Dragging a function:
+
+Creates a node
+
+Inserts function call template
+
+pd.read_csv()
+
+
+No auto-wiring yet — keep it manual.
+
+📌 You are NOT building PyCharm here. Keep it shallow.
+
+5️⃣ Node Connections = Data Flow
+MVP rule
+
+Connections do NOT auto-generate code.
+
+They represent:
+
+Execution dependency
+
+Visual flow
+
+Data passing is done via:
+
+Named outputs
+
+Explicit variables
+
+Example:
+
+df = pd.read_csv(...)
+
+
+User decides what flows — not the system.
+
+This avoids:
+
+hidden bugs
+
+magical behavior
+
+confusion
+
+6️⃣ Execution Engine (Minimal but Solid)
+Backend responsibilities
+
+Run Python code per node
+
+Maintain execution context per graph
+
+Return:
+
+stdout
+
+stderr
+
+artifacts (later)
+
+MVP execution model
+
+Graph → topological sort
+
+Execute nodes sequentially
+
+Cache node results
+
+Re-run only changed nodes
+
+Even a basic version feels magical.
+
+7️⃣ Import / Export Notebook (VERY IMPORTANT)
+Import .ipynb
+
+Each cell → node
+
+Preserve code
+
+Auto-layout nodes vertically
+
+Export .ipynb
+
+Linearize graph
+
+Generate notebook
+
+Preserve outputs where possible
+
+This is HUGE for adoption.
+
+8️⃣ UX That Makes This Feel Premium
+Small things that matter
+
+⌘+Enter to run node
+
+Red border on error
+
+Green check on success
+
+Subtle animations
+
+Dark mode first (ML people 😄)
+
+Minimal UI ≠ boring UI.
+
+🚫 Explicitly OUT of MVP
+
+Be ruthless here.
+
+❌ AutoML
+❌ Fancy charts editor
+❌ Live collaboration
+❌ Version control
+❌ GPU management
+❌ Auto dependency inference
+❌ AI assistants (later!)
+
+You’ll drown if you include these.
+
+🧠 Suggested MVP Folder Mental Model
+frontend/
+ ├─ canvas/
+ ├─ nodes/
+ │   ├─ CodeNode.tsx
+ │   ├─ FunctionNode.tsx
+ ├─ library-panel/
+ ├─ execution/
+ └─ state/
+
+backend/
+ ├─ executor/
+ ├─ kernel/
+ └─ packages/
+
+
+Keep frontend and backend loosely coupled.
+
+remember to use reactflow
